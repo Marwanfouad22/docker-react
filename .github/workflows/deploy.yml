@@ -12,3 +12,5 @@ jobs :
       - run: docker build -t marwaan22/react-test -f Dockerfile.dev .
       - run: docker run -e CI=true marwaan22/react-test npm run test
   
+
+  #updated the password 
