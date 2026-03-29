@@ -1,16 +1,45 @@
-name: run the test autoetzcatty
+name: deploy react
+
 on:
   push:
-    branches :
+    branches:
       - master
-jobs :
+
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - run: docker build -t marwaan22/react-test -f Dockerfile.dev .
+
       - run: docker run -e CI=true marwaan22/react-test npm run test
-  
+
+      - run: docker build -t marwaan22/multi-client ./microservices/client 
+      - run: docker build -t marwaan22/multi-nginx ./microservices/nginx 
+      - run: docker build -t marwaan22/multi-server ./microservices/server 
+      - run: docker build -t marwaan22/multi-worker ./microservices/worker
+
+      - run: docker push marwaan22/multi-client 
+      - run: docker push marwaan22/multi-nginx 
+      - run: docker push marwaan22/multi-server 
+      - run: docker push marwaan22/multi-worker 
+
+#       # Create deployment package (needed for EB)
+#       - name: Create Deployment Package
+#         run: zip -r deploy.zip . -x '*.git*'
+
+        
+#       - name: Deploy to Elastic Beanstalk
+#         uses: einaregilsson/beanstalk-deploy@v22  # prebuilt Action from the GitHub Marketplac
+#         with:
+#           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+#           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+#           application_name: "gamil"             
+#           environment_name: "Gamil-env"          
+#           region: "us-east-1"                   
+#           version_label: ${{ github.sha }}      
+#           deployment_package: deploy.zip        
+#           #secret key updated
 
   #updated the password GITHUB FOR
